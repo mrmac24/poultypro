@@ -25,7 +25,7 @@ import {
   Download
 } from 'lucide-react'
 import { supabase } from '../supabase/supabase'
-import { formatCurrency, formatDate } from '../utils/formatting'
+import { formatCurrency } from '../utils/formatting'
 
 const fetchProductionData = async (days = 30) => {
   const startDate = new Date()

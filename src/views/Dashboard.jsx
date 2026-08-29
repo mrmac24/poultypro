@@ -11,7 +11,7 @@ import {
   User
 } from 'lucide-react'
 import { supabase } from '../supabase/supabase'
-import { formatDate, formatCurrency } from '../utils/formatting'
+import { formatCurrency } from '../utils/formatting'
 import { useAdvancedMetrics, useEnvironmentalCorrelation } from '../hooks/useMetrics'
 import {
   BarChart,

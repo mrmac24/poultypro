@@ -12,7 +12,7 @@ import {
   Package,
   Heart
 } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../supabase/supabase'
 
 const navItems = [
@@ -31,29 +31,12 @@ export default function Layout({ children }) {
   useLocation()
   const navigate = useNavigate()
 
-  useEffect(() => {
-    fetchProfile()
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        fetchProfile()
-      } else {
-        setUserProfile(null)
-      }
-    })
-
-    return () => {
-      subscription?.unsubscribe()
-    }
-  }, [])
-
-  async function fetchProfile() {
+  const fetchProfile = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         // Try to get from profiles table
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('profiles')
           .select('first_name')
           .eq('id', user.id)
@@ -69,7 +52,29 @@ export default function Layout({ children }) {
     } catch (error) {
       console.error('Error fetching profile in Layout:', error)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    void supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        return fetchProfile()
+      }
+      setUserProfile(null)
+    })
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        fetchProfile()
+      } else {
+        setUserProfile(null)
+      }
+    })
+
+    return () => {
+      subscription?.unsubscribe()
+    }
+  }, [fetchProfile])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()

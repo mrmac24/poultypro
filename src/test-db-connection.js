@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import process from 'node:process'
 
 /**
  * Test Supabase database connection
@@ -26,7 +27,7 @@ async function testConnection() {
   try {
     // Test 1: Basic connectivity
     console.log('1️⃣ Testing basic connectivity...')
-    const { data: health, error: healthError } = await supabase.from('flocks').select('count', { count: 'exact', head: true })
+    const { error: healthError } = await supabase.from('flocks').select('count', { count: 'exact', head: true })
     
     if (healthError) {
       throw new Error(`Connection failed: ${healthError.message}`)
